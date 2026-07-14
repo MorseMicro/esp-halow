@@ -162,6 +162,7 @@ void mmhalow_print_version_info(void)
         return;
     }
 
+    ESP_LOGI(TAG, "  HaLow version:           %s", HALOW_VERSION);
     ESP_LOGI(TAG, "  Morselib version:        %s", version.morselib_version);
     ESP_LOGI(TAG, "  Morse firmware version:  %s", version.morse_fw_version);
     ESP_LOGI(TAG, "  Morse chip ID:           0x%04lx", version.morse_chip_id);
