@@ -472,6 +472,10 @@ exit:
 
 TEST_STEP(test_step_verify_busy_pin, "Verify BUSY pin")
 {
+#ifndef CONFIG_HALOW_PS_MODE
+    TEST_LOG_APPEND("CONFIG_HALOW_PS_MODE disabled. Skipping BUSY pin.\n");
+    return TEST_SKIPPED;
+#endif
     /* In this We toggle the BUSY pin on the chip and expect that we can see the GPIO input
      * on the host change and that the busy irq handler gets called. */
     enum test_result result = TEST_PASSED;
