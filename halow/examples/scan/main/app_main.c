@@ -13,9 +13,12 @@
 
 static const char *TAG = "scan";
 
+static SemaphoreHandle_t scan_done_sem = NULL;
+
 static void scan_cb(enum mmwlan_scan_state state, void *args)
 {
     ESP_LOGI(TAG, "Scan finished");
+    xSemaphoreGive(scan_done_sem);
 }
 
 static int akm_str_len(uint32_t akm_suite)
@@ -77,10 +80,14 @@ void app_main(void)
 
     mmhalow_print_version_info();
 
+    scan_done_sem = xSemaphoreCreateBinary();
+
     struct mmhalow_scan_args scargs = {
         .complete_cb = scan_cb,
         .rx_cb = rx_cb,
     };
     mmhalow_scan(&scargs);
 
+    xSemaphoreTake(scan_done_sem, portMAX_DELAY);
+    mmhalow_deinit();
 }
