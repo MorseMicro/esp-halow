@@ -194,7 +194,13 @@ esp_err_t mmhalow_init(const wifi_init_config_t *config)
 
     /* Boot the WLAN interface so that we can retrieve the firmware version. */
     struct mmwlan_boot_args boot_args = MMWLAN_BOOT_ARGS_INIT;
-    (void)mmwlan_boot(&boot_args);
+    enum mmwlan_status boot_status = mmwlan_boot(&boot_args);
+    if (boot_status != MMWLAN_SUCCESS)
+    {
+        /* There is no teardown path here, so treat this as fatal for the interface. */
+        ESP_LOGE(TAG, "mmwlan_boot failed - %d, transceiver is not usable", boot_status);
+        return ESP_FAIL;
+    }
     mmhalow_print_version_info();
 #if !CONFIG_HALOW_PS_MODE
     mmwlan_set_power_save_mode(MMWLAN_PS_DISABLED);
