@@ -7,6 +7,24 @@ menu "Morse Micro Shim Configuration"
         help
             Output gpio pin used to control the RESET_N line.
 
+    config MM_RESET_SETTLE_MS
+        int "Delay after releasing RESET_N, in milliseconds"
+        default 20
+        range 1 1000
+        help
+            Delay between releasing RESET_N and the first SPI clocking. This must cover the
+            transceiver's boot, not just its reset pulse.
+
+            The startup handshake clocks a training sequence and then polls for the command
+            response. A transceiver that is still booting when that clocking starts can latch
+            onto a bit phase that is not byte aligned with the host's framing and hold it for
+            the rest of the boot, so the handshake reads a correct response at the wrong
+            alignment and the driver rejects it as an invalid ack. The failure is intermittent
+            and looks like absent or faulty hardware.
+
+            Adjust this based on the boot time measured on your particular board to ensure
+            that the transceiver has sufficient time to boot.
+
     config MM_WAKE
         int "WAKE pin for MM chip"
         default -1

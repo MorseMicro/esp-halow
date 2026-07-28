@@ -176,7 +176,7 @@ void mmhal_wlan_hard_reset(void)
     gpio_set_level(CONFIG_MM_RESET_N, 0);
     mmosal_task_sleep(5);
     gpio_set_level(CONFIG_MM_RESET_N, 1);
-    mmosal_task_sleep(20);
+    mmosal_task_sleep(CONFIG_MM_RESET_SETTLE_MS);
 }
 
 void mmhal_wlan_spi_cs_assert(void)
