@@ -73,7 +73,13 @@ static void wlan_hal_gpio_init(void)
     gpio_config(&io_conf);
 }
 
-static void wlan_hal_spi_init(void)
+/**
+ * Bring up the SPI bus and add the WLAN transceiver device.
+ *
+ * @returns ESP_OK on success, otherwise the first error encountered. On failure the transceiver is
+ *          unreachable, so the caller must not treat it as recoverable.
+ */
+static esp_err_t wlan_hal_spi_init(void)
 {
     esp_err_t ret;
 
@@ -89,9 +95,24 @@ static void wlan_hal_spi_init(void)
         .flags = SPICOMMON_BUSFLAG_MASTER,
     };
     ret = spi_bus_initialize(SPI2_HOST, &buscfg, SPI_DMA_CH_AUTO);
-    if (ret != ESP_OK)
+    if (ret == ESP_ERR_INVALID_STATE)
     {
-        ESP_LOGE(TAG, "spi_bus_initialize failed\n");
+        /* The host is already initialized. This is reachable because mmwlan_boot() may be retried
+         * after a failed attempt and the failing path does not run wlan_hal_spi_deinit(), so reuse
+         * the bus rather than failing. Drop any device the previous attempt added: otherwise its
+         * handle is leaked and a second device is stacked on the same bus. */
+        ESP_LOGW(TAG, "SPI host already initialized, reusing it");
+        if (spi_handle != NULL)
+        {
+            (void)spi_bus_remove_device(spi_handle);
+            spi_handle = NULL;
+        }
+    }
+    else if (ret != ESP_OK)
+    {
+        ESP_LOGE(TAG, "spi_bus_initialize failed: %s", esp_err_to_name(ret));
+        spi_handle = NULL;
+        return ret;
     }
 
     /* Selected the highest available SPI clock speed that is still below the MM6108's maximum of
@@ -105,7 +126,11 @@ static void wlan_hal_spi_init(void)
     ret = spi_bus_add_device(SPI2_HOST, &dev_cfg, &spi_handle);
     if (ret != ESP_OK)
     {
-        ESP_LOGE(TAG, "spi_bus_add_device failed\n");
+        /* A failed add_device leaves spi_handle indeterminate, so clear it and return rather than
+         * passing it to spi_device_get_actual_freq() below. */
+        ESP_LOGE(TAG, "spi_bus_add_device failed: %s", esp_err_to_name(ret));
+        spi_handle = NULL;
+        return ret;
     }
 
     /* The actual clock frequency may not be the one that was set as it is re-calculated by the
@@ -114,20 +139,29 @@ static void wlan_hal_spi_init(void)
     int actual_freq_khz = 0;
     spi_device_get_actual_freq(spi_handle, &actual_freq_khz);
     ESP_LOGD(TAG, "Actual SPI CLK %dkHz\n", actual_freq_khz);
+
+    return ESP_OK;
 }
 
 static void wlan_hal_spi_deinit(void)
 {
-    esp_err_t ret = spi_bus_remove_device(spi_handle);
-    if (ret != ESP_OK)
+    esp_err_t ret;
+
+    /* spi_handle is NULL when wlan_hal_spi_init() failed before adding the device. */
+    if (spi_handle != NULL)
     {
-        ESP_LOGE(TAG, "spi_bus_remove_device failed\n");
+        ret = spi_bus_remove_device(spi_handle);
+        if (ret != ESP_OK)
+        {
+            ESP_LOGE(TAG, "spi_bus_remove_device failed: %s", esp_err_to_name(ret));
+        }
+        spi_handle = NULL;
     }
 
     ret = spi_bus_free(SPI2_HOST);
     if (ret != ESP_OK)
     {
-        ESP_LOGE(TAG, "spi_bus_initialize failed\n");
+        ESP_LOGE(TAG, "spi_bus_free failed: %s", esp_err_to_name(ret));
     }
 }
 
@@ -245,7 +279,13 @@ void mmhal_wlan_set_spi_irq_enabled(bool enabled)
 void mmhal_wlan_init(void)
 {
     wlan_hal_gpio_init();
-    wlan_hal_spi_init();
+    esp_err_t ret = wlan_hal_spi_init();
+    if (ret != ESP_OK)
+    {
+        /* This HAL entry point cannot report failure upward, so record it here. Without this the
+         * only symptom is a later, causeless "Transport init failed" from mmdrv_init(). */
+        ESP_LOGE(TAG, "SPI init failed (%s), transceiver will be unreachable", esp_err_to_name(ret));
+    }
     /* Raise the RESET_N line to enable the WLAN transceiver. */
     gpio_set_level(CONFIG_MM_RESET_N, 1);
 }
