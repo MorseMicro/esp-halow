@@ -158,6 +158,8 @@ void mmhalow_print_version_info(void)
     if (status != MMWLAN_SUCCESS)
     {
         ESP_LOGE(TAG, "Error occured whilst retrieving version info - %d", status);
+        ESP_LOGI(TAG, "-----------------------------------");
+        return;
     }
 
     ESP_LOGI(TAG, "  Morselib version:        %s", version.morselib_version);
