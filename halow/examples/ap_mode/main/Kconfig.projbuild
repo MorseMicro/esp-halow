@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-menu "HaLow softap Example Configuration"
+menu "HaLow ap_mode Example Configuration"
 
 config WIFI_SSID
 	string "Wi-Fi SSID"

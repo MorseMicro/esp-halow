@@ -133,7 +133,7 @@ All examples are under `examples/`. Each is a self-contained ESP-IDF project.
 |---------|-------------|
 | `sta_connect` | Connect to an AP in STA mode, send a UDP packet |
 | `scan` | Scan for HaLow APs and display results |
-| `softap` | Start a HaLow access point |
+| `ap_mode` | Start a HaLow access point |
 | `iperf` | Interactive throughput testing via console REPL |
 | `dual_if` | Run STA and AP interfaces simultaneously |
 | `sta_reboot` | Reconnect gracefully after a reboot |

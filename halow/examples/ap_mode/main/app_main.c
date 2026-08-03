@@ -22,7 +22,7 @@
 #define S1G_OPCLASS CONFIG_S1G_OPCLASS
 #define MAX_STA_CONN  1
 
-static const char *TAG = "softap";
+static const char *TAG = "ap_mode";
 
 void app_main(void)
 {

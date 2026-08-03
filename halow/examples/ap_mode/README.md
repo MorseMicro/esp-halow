@@ -4,9 +4,9 @@ Copyright 2026 Morse Micro
 SPDX-License-Identifier: Apache-2.0
 -->
 
-# softap
+# ap_mode
 
-Starts a Wi-Fi HaLow SoftAP on a configurable S1G channel. Uses SAE security when a
+Starts a Wi-Fi HaLow interface in AP mode on a configurable S1G channel. Uses SAE security when a
 passphrase is set. PMF is required and a single station is allowed.
 
 ---
@@ -27,12 +27,12 @@ For example, for a Seeed Studio XIAO ESP32-S3 paired with a XIAO Wi-Fi HaLow
     idf.py menuconfig build   # set the country code (required)
 
 ## Running
-Flash and open the serial monitor to watch the SoftAP start and stations connect:
+Flash and open the serial monitor to watch the AP start and stations connect:
 
     idf.py flash monitor
 
 ## Configuration
-Options under `HaLow softap Example Configuration` (`idf.py menuconfig`):
+Options under `HaLow ap_mode Example Configuration` (`idf.py menuconfig`):
 
 | Option | Type | Default | Description |
 | --- | --- | --- | --- |
