@@ -19,7 +19,7 @@ menu "Wi-Fi HaLow Connection Manager"
 
 	config HALOW_PS_MODE
 		bool "Enable Morse Micro HaLow Powersave Mode"
-		default true
+		default y
 		depends on MM_WAKE >= 0
 		depends on MM_BUSY >= 0
 		help

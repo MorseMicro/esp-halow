@@ -11,6 +11,10 @@ CONFIG_MM_SPI_MISO=20
 CONFIG_MM_SPI_CS=21
 CONFIG_MM_SPI_IRQ=2
 
+# These Seeed boards need two unpopulated resistors footprints to be either
+# bridged or populated with a 0 ohm to route busy and wake to the Xiao header.
+CONFIG_HALOW_PS_MODE=n
+
 # Morse Micro chip configuration
 CONFIG_MM_BCF_FILE="bcf_fgh100mhaamd.bin"
 CONFIG_MM_CHIP_MM6108=y
