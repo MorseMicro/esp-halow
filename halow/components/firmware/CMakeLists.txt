@@ -137,6 +137,23 @@ if(NOT FW_MBIN)
     return()
 endif()
 
+if(CONFIG_HALOW_COMPRESS_FIRMWARE)
+    idf_build_get_property(python PYTHON)
+    get_filename_component(name "${FW_MBIN}" NAME)
+    set(FW_FINAL "${CMAKE_CURRENT_BINARY_DIR}/${FW_MBIN}.mbin")
+    add_custom_command(
+        OUTPUT "${FW_FINAL}"
+        COMMAND
+            ${python}
+            ${COMPONENT_DIR}/tools/compress-mbin.py
+            "${FW_MBIN}"
+            -o "${FW_FINAL}"
+        DEPENDS "${FW_MBIN}"
+    )
+else()
+    set(FW_FINAL "${FW_MBIN}")
+endif()
+
 add_library(morsefirmware STATIC)
-target_add_binary_data(morsefirmware "${FW_MBIN}"  BINARY RENAME_TO firmware_binary)
+target_add_binary_data(morsefirmware "${FW_FINAL}"  BINARY RENAME_TO firmware_binary)
 target_add_binary_data(morsefirmware "${BCF_MBIN}" BINARY RENAME_TO bcf_binary)

@@ -26,6 +26,13 @@ menu "Wi-Fi HaLow Connection Manager"
 			This can only be set to true for devices which have the BUSY and WAKE
 			pins connected.
 
+    config HALOW_COMPRESS_FIRMWARE
+        bool "Compresses firmware at the cost of the HaLow chip taking longer to boot"
+        default y
+        help
+            This saves a large chunk of flash at the cost of extra startup time
+            decompressing the firmware on boot
+
     config HALOW_AP_MODE
         bool "Enable HaLow AP-mode support"
         default n
