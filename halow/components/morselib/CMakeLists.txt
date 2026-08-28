@@ -51,6 +51,7 @@ set(SRCS
     ${ROOT_DIR}/src/umac/ies/ies_common.c
     ${ROOT_DIR}/src/umac/ies/wmm.c
     ${ROOT_DIR}/src/umac/ies/morse_ie.c
+    ${ROOT_DIR}/src/umac/ies/vendor_ie.c
     ${ROOT_DIR}/src/umac/interface/umac_interface.c
     ${ROOT_DIR}/src/umac/keys/connection_keys.c
     ${ROOT_DIR}/src/umac/keys/umac_keys.c
