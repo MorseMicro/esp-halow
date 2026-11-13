@@ -2,7 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 description: Morse Micro HaLow WLAN component for esp32
-version: "2.11.2-esp32-2"
+version: "2.14.3-esp32-1"
 license: "Apache-2.0"
 dependencies:
   idf: ">=5.4.4,<6.0"
